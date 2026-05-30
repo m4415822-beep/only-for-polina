@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Для Полиночки</title>
+    <title>Полиночка я тебя люблю ❤️</title>
     <style>
         * {
             margin: 0;
@@ -12,57 +12,73 @@
         }
 
         body {
-            background-color: #050505;
+            background: radial-gradient(circle at center, #1a0510 0%, #050108 100%);
             overflow: hidden;
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
-            font-family: 'Arial', sans-serif;
+            font-family: 'Montserrat', 'Segoe UI', Helvetica, Arial, sans-serif;
+            user-select: none;
+            -webkit-user-select: none;
         }
 
-        /* Контейнер для сердца и текста */
-        .heart-container {
-            position: relative;
-            width: 300px;
-            height: 300px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            animation: pulse 1.2s infinite ease-in-out;
+        .scene {
+            perspective: 1000px;
             z-index: 10;
         }
 
-        /* Само сердце через SVG для идеальной четкости */
+        .heart-container {
+            position: relative;
+            width: 320px;
+            height: 320px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transform-style: preserve-3d;
+            animation: floatAndPulse 2.5s infinite ease-in-out;
+            transition: transform 0.2s ease;
+        }
+
         .heart-svg {
             position: absolute;
             width: 100%;
             height: 100%;
-            fill: #ff2a6d;
-            filter: drop-shadow(0 0 20px #ff2a6d) drop-shadow(0 0 40px #ff2a6d);
+            fill: url(#heartGradient);
+            filter: drop-shadow(0 0 15px rgba(255, 42, 109, 0.8)) 
+                    drop-shadow(0 0 40px rgba(255, 42, 109, 0.4));
+            transform: translateZ(20px);
         }
 
-        /* Текст внутри сердца */
         .heart-text {
             position: relative;
-            color: white;
-            font-size: 28px;
-            font-weight: bold;
-            text-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
-            z-index: 11;
+            color: #ffffff;
+            font-size: 24px;
+            font-weight: 700;
+            line-height: 1.2;
             letter-spacing: 1px;
+            text-align: center;
+            z-index: 11;
+            white-space: pre-line;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.8),
+                         0 4px 10px rgba(0, 0, 0, 0.7);
+            transform: translateZ(40px);
+            animation: textGlow 2s infinite alternate;
+            padding: 0 24px;
         }
 
-        /* Анимация биения сердца */
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            30% { transform: scale(1.15); }
-            45% { transform: scale(1.05); }
-            60% { transform: scale(1.2); }
-            100% { transform: scale(1); }
+        @keyframes floatAndPulse {
+            0% { transform: rotateX(10deg) rotateY(0deg) scale(1); }
+            50% { transform: rotateX(15deg) rotateY(5deg) scale(1.1); }
+            100% { transform: rotateX(10deg) rotateY(0deg) scale(1); }
         }
 
-        /* Стили для фоновых частиц */
+        @keyframes textGlow {
+            0% { text-shadow: 0 0 10px rgba(255,255,255,0.6), 0 4px 5px rgba(0,0,0,0.5); }
+            100% { text-shadow: 0 0 20px rgba(255,105,180,1), 0 4px 5px rgba(0,0,0,0.5); }
+        }
+
         canvas {
             position: absolute;
             top: 0;
@@ -70,76 +86,267 @@
             width: 100%;
             height: 100%;
             z-index: 1;
+            pointer-events: none;
+        }
+
+        .hint {
+            position: absolute;
+            bottom: 30px;
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 14px;
+            letter-spacing: 1px;
+            z-index: 5;
+            pointer-events: none;
+            animation: fade 2s infinite;
+        }
+
+        @keyframes fade {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 0.8; }
+        }
+
+        .flower-layer {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            z-index: 6;
+            overflow: hidden;
+        }
+
+        .flower {
+            position: absolute;
+            left: 0;
+            top: 0;
+            font-size: 26px;
+            will-change: transform, opacity;
+            animation: flowerFly 1500ms ease-out forwards;
+            filter: drop-shadow(0 0 6px rgba(255,255,255,0.35));
+        }
+
+        @keyframes flowerFly {
+            0% {
+                opacity: 0;
+                transform: translate(0, 0) scale(0.3) rotate(0deg);
+            }
+            10% {
+                opacity: 1;
+            }
+            100% {
+                opacity: 0;
+                transform: translate(var(--dx), var(--dy)) scale(var(--scale)) rotate(var(--rot));
+            }
+        }
+
+        .love-burst {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            color: #fff;
+            font-weight: 700;
+            font-size: 18px;
+            letter-spacing: 1px;
+            opacity: 0;
+            pointer-events: none;
+            z-index: 12;
         }
     </style>
 </head>
 <body>
 
-    <canvas id="pinkboard"></canvas>
+    <canvas id="cosmicParticles"></canvas>
+    <div class="flower-layer" id="flowerLayer"></div>
 
-    <div class="heart-container">
-        <!-- SVG Сердце -->
-        <svg class="heart-svg" viewBox="0 0 32 29.6">
-            <path d="M23.6,0c-3.4,0-6.3,2.7-7.6,5.6C14.7,2.7,11.8,0,8.4,0C3.8,0,0,3.8,0,8.4c0,9.4,9.5,11.9,16,21.2
-            c6.1-9.3,16-12.1,16-21.2C32,3.8,28.2,0,23.6,0z"/>
-        </svg>
-        <!-- Надпись -->
-        <div class="heart-text">Полиночка</div>
+    <div class="scene">
+        <div class="heart-container" id="mainHeart">
+            <svg class="heart-svg" viewBox="0 0 32 29.6">
+                <defs>
+                    <linearGradient id="heartGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#ff5e62;stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:#ff2a6d;stop-opacity:1" />
+                    </linearGradient>
+                </defs>
+                <path d="M23.6,0c-3.4,0-6.3,2.7-7.6,5.6C14.7,2.7,11.8,0,8.4,0C3.8,0,0,3.8,0,8.4c0,9.4,9.5,11.9,16,21.2
+                c6.1-9.3,16-12.1,16-21.2C32,3.8,28.2,0,23.6,0z"/>
+            </svg>
+            <div class="heart-text">Полиночка
+я тебя люблю</div>
+        </div>
     </div>
 
-    <script>
-        /* Скрипт для красивого эффекта вылетающих маленьких сердечек на фоне */
-        const canvas = document.getElementById('pinkboard');
-        const ctx = canvas.getContext('2d');
+    <div class="hint">Нажми на сердце или пошевели мышкой</div>
 
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
+    <script>
+        const canvas = document.getElementById('cosmicParticles');
+        const ctx = canvas.getContext('2d');
+        const flowerLayer = document.getElementById('flowerLayer');
+        const heartContainer = document.getElementById('mainHeart');
+
+        let width = canvas.width = window.innerWidth;
+        let height = canvas.height = window.innerHeight;
+
+        let mouse = { x: width / 2, y: height / 2, targetX: width / 2, targetY: height / 2 };
+        let clickPulse = 0;
 
         window.addEventListener('resize', () => {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
         });
 
-        class Particle {
-            constructor() {
-                this.x = Math.random() * canvas.width;
-                this.y = canvas.height + Math.random() * 100;
-                this.size = Math.random() * 8 + 2;
-                this.speedY = Math.random() * 2 + 1;
-                this.opacity = Math.random() * 0.5 + 0.5;
+        window.addEventListener('mousemove', (e) => {
+            mouse.targetX = e.clientX;
+            mouse.targetY = e.clientY;
+        });
+
+        window.addEventListener('touchmove', (e) => {
+            if (e.touches.length > 0) {
+                mouse.targetX = e.touches[0].clientX;
+                mouse.targetY = e.touches[0].clientY;
+            }
+        });
+
+        class BackgroundHeart {
+            constructor(isExplosion = false, ex = 0, ey = 0) {
+                this.isExplosion = isExplosion;
+                this.x = isExplosion ? ex : Math.random() * width;
+                this.y = isExplosion ? ey : height + Math.random() * 100;
+                this.size = Math.random() * 12 + 4;
+
+                if (isExplosion) {
+                    const angle = Math.random() * Math.PI * 2;
+                    const speed = Math.random() * 6 + 2;
+                    this.speedX = Math.cos(angle) * speed;
+                    this.speedY = Math.sin(angle) * speed;
+                } else {
+                    this.speedX = Math.sin(Math.random() * 10) * 0.5;
+                    this.speedY = -(Math.random() * 1.5 + 0.5);
+                }
+
+                this.opacity = Math.random() * 0.6 + 0.4;
+                this.rotation = Math.random() * Math.PI;
+                this.rotSpeed = (Math.random() - 0.5) * 0.02;
+                this.depth = Math.random() * 0.8 + 0.2;
             }
 
             update() {
-                this.y -= this.speedY;
-                if (this.y < -10) {
-                    this.y = canvas.height + 10;
-                    this.x = Math.random() * canvas.width;
+                if (this.isExplosion) {
+                    this.x += this.speedX;
+                    this.y += this.speedY;
+                    this.speedY += 0.05;
+                    this.opacity -= 0.01;
+                } else {
+                    const currentMouseDiffX = (mouse.x - width / 2) * 0.03 * this.depth;
+                    this.y += this.speedY;
+                    this.x += this.speedX + (currentMouseDiffX * 0.1);
+                    this.rotation += this.rotSpeed;
+
+                    if (this.y < -20 || this.opacity <= 0) {
+                        this.y = height + 20;
+                        this.x = Math.random() * width;
+                        this.opacity = Math.random() * 0.6 + 0.4;
+                    }
                 }
             }
 
             draw() {
-                ctx.fillStyle = `rgba(255, 42, 109, ${this.opacity})`;
+                ctx.save();
+                ctx.translate(this.x, this.y);
+                ctx.rotate(this.rotation);
+                ctx.scale(this.depth, this.depth);
+
+                ctx.fillStyle = `rgba(255, ${42 + Math.floor(this.y * 0.1)}, 109, ${this.opacity})`;
+
                 ctx.beginPath();
-                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.moveTo(0, 0);
+                ctx.bezierCurveTo(-this.size/2, -this.size/2, -this.size, -this.size/3, -this.size, 0);
+                ctx.bezierCurveTo(-this.size, this.size/2, -this.size/3, this.size/1.5, 0, this.size);
+                ctx.bezierCurveTo(this.size/3, this.size/1.5, this.size, this.size/2, this.size, 0);
+                ctx.bezierCurveTo(this.size, -this.size/3, this.size/2, -this.size/2, 0, 0);
+                ctx.closePath();
                 ctx.fill();
+
+                ctx.restore();
             }
         }
 
-        const particles = [];
-        for (let i = 0; i < 50; i++) {
-            particles.push(new Particle());
+        const listParticles = [];
+        for (let i = 0; i < 60; i++) {
+            listParticles.push(new BackgroundHeart());
         }
 
-        function animate() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            particles.forEach(p => {
+        function createExplosion(x, y) {
+            for (let i = 0; i < 35; i++) {
+                listParticles.push(new BackgroundHeart(true, x, y));
+            }
+        }
+
+        function createFlowerBurst(x, y) {
+            const flowers = ['💐', '🌸', '🌷', '🌹', '🌺', '💖'];
+            const amount = 42;
+
+            for (let i = 0; i < amount; i++) {
+                const flower = document.createElement('div');
+                flower.className = 'flower';
+                flower.textContent = flowers[Math.floor(Math.random() * flowers.length)];
+
+                const angle = Math.random() * Math.PI * 2;
+                const distance = 120 + Math.random() * 220;
+                const dx = Math.cos(angle) * distance;
+                const dy = Math.sin(angle) * distance - (60 + Math.random() * 120);
+
+                flower.style.left = `${x}px`;
+                flower.style.top = `${y}px`;
+                flower.style.setProperty('--dx', `${dx}px`);
+                flower.style.setProperty('--dy', `${dy}px`);
+                flower.style.setProperty('--rot', `${(Math.random() * 720 - 360)}deg`);
+                flower.style.setProperty('--scale', `${0.8 + Math.random() * 1.3}`);
+
+                flowerLayer.appendChild(flower);
+
+                flower.addEventListener('animationend', () => flower.remove());
+            }
+        }
+
+        heartContainer.addEventListener('click', (e) => {
+            const rect = heartContainer.getBoundingClientRect();
+            const x = e.clientX || (rect.left + rect.width / 2);
+            const y = e.clientY || (rect.top + rect.height / 2);
+
+            createExplosion(x, y);
+            createFlowerBurst(x, y);
+
+            clickPulse = 1;
+        });
+
+        function render() {
+            ctx.clearRect(0, 0, width, height);
+
+            mouse.x += (mouse.targetX - mouse.x) * 0.08;
+            mouse.y += (mouse.targetY - mouse.y) * 0.08;
+
+            const xAxis = (width / 2 - mouse.x) / 15;
+            const yAxis = (height / 2 - mouse.y) / 15;
+
+            clickPulse *= 0.92;
+            if (clickPulse < 0.001) clickPulse = 0;
+
+            const scale = 1 + clickPulse * 0.12;
+            heartContainer.style.transform = `rotateY(${-xAxis}deg) rotateX(${yAxis}deg) scale(${scale})`;
+
+            for (let i = listParticles.length - 1; i >= 0; i--) {
+                const p = listParticles[i];
                 p.update();
                 p.draw();
-            });
-            requestAnimationFrame(animate);
+
+                if (p.isExplosion && p.opacity <= 0) {
+                    listParticles.splice(i, 1);
+                }
+            }
+
+            requestAnimationFrame(render);
         }
 
-        animate();
+        render();
     </script>
 </body>
 </html>
